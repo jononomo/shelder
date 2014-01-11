@@ -1,5 +1,5 @@
-from selenium_spiders import InteractiveSeleniumSpider
-from public_employee.items import SullyDishItem
+from shelder.spiders import InteractiveSeleniumSpider
+from sullydish.items import SullyDishItem
 
 class DishAndrewsullivanComSpider(InteractiveSeleniumSpider):
     name = "dish.andrewsullivan.com"

@@ -1,0 +1,2 @@
+#!/usr/bin/env python
+print 'type "python setup.py" for now. Pass --help for help.'

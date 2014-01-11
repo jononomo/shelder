@@ -10,9 +10,9 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 
 setup(
-    name='jonti',
+    name='shelder',
     version='0.1.0',
-    py_modules=['jonti'],
+    py_packages=['shelder'],
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
     install_requires = reqs

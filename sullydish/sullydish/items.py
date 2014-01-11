@@ -6,6 +6,6 @@
 from scrapy.item import Item, Field
 
 class SullydishItem(Item):
-    # define the fields for your item here like:
-    # name = Field()
-    pass
+    headline = Field()
+    the_time = Field()
+    entry_content = Field()

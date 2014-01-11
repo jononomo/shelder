@@ -1,10 +1,13 @@
-class SeleniumHttpPage(object):
+from exceptions import UrlRegexException, UnscrapeablePageException, AbstractPageException
+import re
+
+class HttpPage(object):
     def __init__(self, selenium_spider):
         self.spider = selenium_spider
         self.driver = selenium_spider.driver
         self.nav_queue = []
-        print self.__class__.__name__
-        print 'about to call init()'
+        # print self.__class__.__name__
+        # print 'about to call init()'
         self.init()
 
     @classmethod
@@ -43,7 +46,8 @@ class SeleniumHttpPage(object):
             print function
 
     def init(self):
-        raise AbstractPageException('SeleniumHttpPage should not be directly instantiated')
+        # raise AbstractPageException('HttpPage should not be directly instantiated')
+        pass
 
 
 
@@ -51,7 +55,9 @@ class PageRegistry(object):
     page_class_list = []
     active_pages = {}
     def __init__(self):
-        self.register(SeleniumHttpPage)
+        # print 'PageRegistry.__init__'
+        self.register(HttpPage)
+        # print 'PageRegistry.__init__  done'
         # self.print_registry()
 
     def get_page(self, spider):
@@ -75,6 +81,7 @@ class PageRegistry(object):
         return None
 
     def register(self, page_class):
+        # print 'registering: ', page_class
         self.page_class_list.append(page_class)
 
     def print_registry(self):

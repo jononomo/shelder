@@ -1,4 +1,5 @@
-from distutils.core import setup
+#from distutils.core import setup
+from setuptools import setup
 from pip.req import parse_requirements
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
@@ -8,13 +9,21 @@ install_reqs = parse_requirements('./requirements.txt')
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 reqs = [str(ir.req) for ir in install_reqs]
 
+print 'start ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+print reqs
+print 'end ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 
 setup(
     name='shelder',
-    version='0.1.0',
-    py_packages=['shelder'],
+    version='0.1.8',
+    packages=['shelder'],
+    package_dir={'shelder': 'shelder'},
+    package_data={'shelder': ['LIT_LICENSE']},
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
+    description='Selenium Shell Spider',
+    license='LIT_LICENSE',
+    platforms=[],
     install_requires = reqs
     )
 

@@ -4,7 +4,11 @@ from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 from urlparse import urlparse
 from exceptions import UrlRegexException, UnscrapeablePageException, AbstractPageException
+from selenium_api import PageRegistry, HttpPage
 import re
+import os
+import datetime
+import time
 
 class AbstractSeleniumSpider(BaseSpider):
     name = 'AbstractSeleniumSpider'
@@ -77,17 +81,25 @@ class AbstractSeleniumSpider(BaseSpider):
 
 class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     name = 'InteractiveSeleniumSpider'
+    load_time = -1.0
 
     def __init__(self):
-        try:
-            self.selenium_api_registry = SeleniumAPIRegistry()
-            self.RUN = False # when False, it will expect command prompt interaction.
-            self.KEEP_CRAWLING = True
-            super(InteractiveSeleniumSpider, self).__init__()
-            self.shell_local_context = { 'self': self}
-        except Exception, e:
-            self.shutdown()
-            raise e
+        # try:
+        # print '-- A'
+        self.selenium_api_registry = PageRegistry()
+        # print '-- B'
+        self.RUN = False # when False, it will expect command prompt interaction.
+        self.KEEP_CRAWLING = True
+        # print '-- C'
+        start_load_time = time.time()
+        super(InteractiveSeleniumSpider, self).__init__()
+        finish_load_time = time.time()
+        self.load_time = finish_load_time - start_load_time
+        # print '-- D'
+        self.shell_local_context = { 'self': self, 'time', self.load_time}
+        # except Exception, e:
+        #     self.shutdown()
+        #     raise e
 
     def shell(self):
         self.RUN = False
@@ -111,7 +123,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         self.selenium_api_registry.register(page_class)
 
     def get_shell_input(self):
-        return raw_input('SCRAPER> ').split(None,1) # results in ['command', 'the args']
+        return raw_input('SHELDER> ').split(None,1) # results in ['command', 'the args']
 
 
     def scrape_items(self):
@@ -167,10 +179,14 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         elif command == 'exit'     : self.exit()
         elif command == 'help'     : self.print_help()
         elif command == 'vars'     : self.print_local_context()
-        elif command == 'sshot'    : print save_screenshot()
-        elif command == 'jump'     : self.driver.get(arg1)
-        elif command == 'info'     : print eval('help(driver)', {}, self.shell_local_context)
+        elif command == 'time'     : self.ptime()
+        elif command == 'sshot'    : print self.save_screenshot()
+        elif command == 'jump'     : print self.driver.get(arg1)
+        elif command == 'info'     : print eval('help(PAGE)', {}, self.shell_local_context)
         else: self.eval_or_exec(' '.join([command, ('' if not args else args)]))
+
+    def ptime(self):
+        print 'The last recorded page.load_time for spider['+self.name+'] is: %0.0f' % self.load_time
 
     def exit(self):
         # perhaps counter-intuitively, we want to "run", meaning exit the shell and go back
@@ -203,8 +219,8 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         print '|          exit | exit the spider, shutdown the Selenium browser, and quit  |'
         print '|          vars | list the variables in the shell context                   |'
         print '|          help | print this help message                                   |'
-        print '|          info | documentation for the current newsela page                |'
-        print '|         sshot | take a screenshot - saved in $BDS_HOME/screenshots/       |'
+        print '|          info | documentation for the current shelder page                |'
+        print '|         sshot | take a screenshot - saved in $SHELDER_HOME/screenshots/   |'
         print '|          time | how long it took the current page to load, in secs        |'
         print '|          back | the \'back\' button in the browser                          |'
         print '|       forward | the \'forward\' button in the browser                       |'
@@ -214,3 +230,13 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         print 'forwarded to python and expected to be a valid python statement within the'
         print 'spider\'s shell context.  Variables that are available to you can be examined'
         print 'with the \'vars\' command.'
+
+    def save_screenshot(self):
+        page = self.shell_local_context['PAGE']
+        output_dir = os.environ['SHELDER_OUTPUT'] if 'SHELDER_OUTPUT' in os.environ else '.'
+        sshot_dir = os.path.join(output_dir, 'sshots')
+        if not os.path.exists(sshot_dir): os.mkdir(sshot_dir) 
+        stamp = datetime.datetime.now().strftime("%Y%m%d.%H%M%S.%f")[:19]
+        filename = self.name+'.'+stamp+'.png'
+        success = self.driver.save_screenshot(os.path.join(sshot_dir,filename))
+        return {'success': success, 'filename': filename }

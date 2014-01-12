@@ -9,13 +9,13 @@ install_reqs = parse_requirements('./requirements.txt')
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 reqs = [str(ir.req) for ir in install_reqs]
 
-print 'start ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-print reqs
-print 'end ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+# print 'start ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+# print reqs
+# print 'end ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 
 setup(
     name='shelder',
-    version='0.1.9',
+    version='0.2.0',
     packages=['shelder'],
     package_dir={'shelder': 'shelder'},
     package_data={'shelder': ['LIT_LICENSE']},

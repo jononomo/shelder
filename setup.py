@@ -38,21 +38,23 @@ reqs = [str(ir.req) for ir in install_reqs]
 # print reqs
 # print 'end ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 
+df = [
+    ('', ['LIT_LICENSE','requirements.txt', 'ez_setup.py'])
+]
+
 setup(
     name='shelder',
     version=VERSION,
     packages=['shelder'],
 
     package_dir={'': 'src'},
-    data_files = [
-        ('shelder', ['LIT_LICENSE', 'requirements.txt', 'ez_setup.py']),
-    ],
+    data_files = df,
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
     url='shelder.literatelabs.com',
     description='Selenium Shell Spider',
     license=LIT_LICENSE,
-    platforms=[],
+    platforms=['Python 2.7', 'virtualvenv 1.10.1', 'setuptools 2.1', 'Mac/Unix'],
     install_requires = reqs,
     long_description="""
         Shelder is a library to enable Scrapy to be used with Selenium.  It

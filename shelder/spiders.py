@@ -96,7 +96,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         finish_load_time = time.time()
         self.load_time = finish_load_time - start_load_time
         # print '-- D'
-        self.shell_local_context = { 'self': self, 'time', self.load_time}
+        self.shell_local_context = { 'self': self, 'time': self.load_time}
         # except Exception, e:
         #     self.shutdown()
         #     raise e
@@ -139,8 +139,13 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     def navigate(self):
         page = self.get_page()
         if page.navigable():
+            a_load_time = time.time()
             page = page.navigate()
+            b_load_time = time.time()
+            self.load_time = b_load_time - a_load_time
+            self.shell_local_context['time'] = self.load_time
             print str(self.loop_count)+'shell-NAVIGATE: '+self.driver.current_url
+            # print self.load_time
             return True
         else:
             # nav_div = self.mainContent.find_element_by_id('WebPartWPQ2')
@@ -181,12 +186,12 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         elif command == 'vars'     : self.print_local_context()
         elif command == 'time'     : self.ptime()
         elif command == 'sshot'    : print self.save_screenshot()
-        elif command == 'jump'     : print self.driver.get(arg1)
+        # elif command == 'jump'     : print self.driver.get(arg1)
         elif command == 'info'     : print eval('help(PAGE)', {}, self.shell_local_context)
         else: self.eval_or_exec(' '.join([command, ('' if not args else args)]))
 
     def ptime(self):
-        print 'The last recorded page.load_time for spider['+self.name+'] is: %0.0f' % self.load_time
+        print 'The last recorded page.load_time for spider['+self.name+'] is: %2.1f seconds' % self.load_time
 
     def exit(self):
         # perhaps counter-intuitively, we want to "run", meaning exit the shell and go back
@@ -209,6 +214,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
                 exec(cmd_line, {}, self.shell_local_context)
             except Exception, e1:
                 print e
+                print 'evan and exec exceptions...'
                 #traceback.print_exc()
 
     def print_help(self):
@@ -220,11 +226,11 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         print '|          vars | list the variables in the shell context                   |'
         print '|          help | print this help message                                   |'
         print '|          info | documentation for the current shelder page                |'
-        print '|         sshot | take a screenshot - saved in $SHELDER_HOME/screenshots/   |'
+        print '|         sshot | take a screenshot - saved in $SHELDER_OUTPUT/sshots/      |'
         print '|          time | how long it took the current page to load, in secs        |'
         print '|          back | the \'back\' button in the browser                          |'
         print '|       forward | the \'forward\' button in the browser                       |'
-        print '|    jump <url> | jumps directly to the page at the given url               |'
+        # print '|    jump <url> | jumps directly to the page at the given url               |'
         print '+---------------+-----------------------------------------------------------+'
         print '\nAny input that does not begin with one of the commands above will be'
         print 'forwarded to python and expected to be a valid python statement within the'

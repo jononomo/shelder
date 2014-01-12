@@ -15,7 +15,7 @@ print 'end ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 
 setup(
     name='shelder',
-    version='0.1.8',
+    version='0.1.9',
     packages=['shelder'],
     package_dir={'shelder': 'shelder'},
     package_data={'shelder': ['LIT_LICENSE']},

@@ -21,6 +21,7 @@ setup(
     package_data={'shelder': ['LIT_LICENSE']},
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
+    url='literatelabs.com',
     description='Selenium Shell Spider',
     license='LIT_LICENSE',
     platforms=[],

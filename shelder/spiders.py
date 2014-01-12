@@ -240,7 +240,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     def save_screenshot(self):
         page = self.shell_local_context['PAGE']
         output_dir = os.environ['SHELDER_OUTPUT'] if 'SHELDER_OUTPUT' in os.environ else '.'
-        sshot_dir = os.path.join(output_dir, 'sshots')
+        sshot_dir = os.path.join(output_dir, '../sshots')
         if not os.path.exists(sshot_dir): os.mkdir(sshot_dir) 
         stamp = datetime.datetime.now().strftime("%Y%m%d.%H%M%S.%f")[:19]
         filename = self.name+'.'+stamp+'.png'

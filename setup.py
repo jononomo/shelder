@@ -24,6 +24,11 @@ with open('VERSION') as V:
     VERSION = VERSION if (FILEVERS > VERSION) else FVERS 
 
 VERSION = VERSION+'-'+dttm
+LIT_LICENSE = 'LIT_LICENSE'
+with open('LIT_LICENSE') as LL:
+    LLIC = LL.read()
+    if len(LLIC) > 20: LIT_LICENSE = LLIC
+    print 'LIT_LICENSE:'+ LIT_LICENSE
 
 # reqs is a list of requirement
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
@@ -37,7 +42,8 @@ setup(
     name='shelder',
     version=VERSION,
     packages=['shelder'],
-    package_dir={'shelder': 'shelder'},
+
+    package_dir={'': 'src'},
     data_files = [
         ('shelder', ['LIT_LICENSE', 'requirements.txt', 'ez_setup.py']),
     ],
@@ -45,7 +51,7 @@ setup(
     author_email='dev@literatelabs.com',
     url='shelder.literatelabs.com',
     description='Selenium Shell Spider',
-    license='LIT_LICENSE',
+    license=LIT_LICENSE,
     platforms=[],
     install_requires = reqs,
     long_description="""

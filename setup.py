@@ -1,9 +1,29 @@
+from ez_setup import use_setuptools
+use_setuptools()
+
+from datetime import datetime
+
 #from distutils.core import setup
-from setuptools import setup
+from setuptools import setup, find_packages
 from pip.req import parse_requirements
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
 install_reqs = parse_requirements('./requirements.txt')
+
+now = datetime.now()
+isof = now.isoformat()
+# 2014-01-12T15:25:00.123
+# 12345678901234567890123
+dt = isof[5:7]+isof[8:10]
+tm = isof[11:13]+isof[14:16]
+dttm = dt+'-'+tm
+VERSION = '9.9.9'
+with open('VERSION') as V:
+    FILEVERS = V.read()
+    FVERS = FILEVERS[:5]
+    VERSION = VERSION if (FILEVERS > VERSION) else FVERS 
+
+VERSION = VERSION+'-'+dttm
 
 # reqs is a list of requirement
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
@@ -15,17 +35,24 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name='shelder',
-    version='0.2.1',
+    version=VERSION,
     packages=['shelder'],
     package_dir={'shelder': 'shelder'},
-    package_data={'shelder': ['LIT_LICENSE', 'requirements.txt']},
+    data_files = [
+        ('shelder', ['LIT_LICENSE', 'requirements.txt', 'ez_setup.py']),
+    ],
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
-    url='literatelabs.com',
+    url='shelder.literatelabs.com',
     description='Selenium Shell Spider',
     license='LIT_LICENSE',
     platforms=[],
-    install_requires = reqs
+    install_requires = reqs,
+    long_description="""
+        Shelder is a library to enable Scrapy to be used with Selenium.  It
+        provides a command-line shell for configuring, exploring, and driving
+        live crawlers from within their Selenium browser context.
+        """
     )
 
 

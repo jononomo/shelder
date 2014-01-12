@@ -15,10 +15,10 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name='shelder',
-    version='0.2.0',
+    version='0.2.1',
     packages=['shelder'],
     package_dir={'shelder': 'shelder'},
-    package_data={'shelder': ['LIT_LICENSE']},
+    package_data={'shelder': ['LIT_LICENSE', 'requirements.txt']},
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
     url='literatelabs.com',

@@ -1,5 +1,17 @@
 from exceptions import UrlRegexException, UnscrapeablePageException, AbstractPageException
 import re
+from scrapy.item import Item, Field
+
+class PersonItem(Item):
+    title = Field()
+    firstname = Field()
+    middle = Field()
+    lastname = Field()
+    suffix = Field()
+    ss_num = Field()
+    birthdate = Field()
+    gender = Field()
+
 
 class HttpPage(object):
     def __init__(self, selenium_spider):

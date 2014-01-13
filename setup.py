@@ -3,12 +3,15 @@ use_setuptools()
 
 from datetime import datetime
 
-#from distutils.core import setup
 from setuptools import setup, find_packages
 from pip.req import parse_requirements
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('./requirements.txt')
+install_reqs = parse_requirements('./src/shelder.egg-info/requires.txt')
+#install_reqs = parse_requirements('./requirements.txt')
+# reqs is a list of requirement
+# e.g. ['django==1.5.1', 'mezzanine==1.4.6']
+reqs = [str(ir.req) for ir in install_reqs]
 
 now = datetime.now()
 isof = now.isoformat()
@@ -24,31 +27,22 @@ with open('VERSION') as V:
     VERSION = VERSION if (FILEVERS > VERSION) else FVERS 
 
 VERSION = VERSION+'-'+dttm
+
+
 LIT_LICENSE = 'LIT_LICENSE'
-with open('LIT_LICENSE') as LL:
-    LLIC = LL.read()
-    if len(LLIC) > 20: LIT_LICENSE = LLIC
-    print 'LIT_LICENSE:'+ LIT_LICENSE
+try:
+    with open('LIT_LICENSE') as LL:
+        LLIC = LL.read()
+        if len(LLIC) > 20: LIT_LICENSE = LLIC
+except:
+    print 'LIT_LICENSE'
 
-# reqs is a list of requirement
-# e.g. ['django==1.5.1', 'mezzanine==1.4.6']
-reqs = [str(ir.req) for ir in install_reqs]
-
-# print 'start ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-# print reqs
-# print 'end ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-
-df = [
-    ('', ['LIT_LICENSE','requirements.txt', 'ez_setup.py'])
-]
 
 setup(
     name='shelder',
     version=VERSION,
     packages=['shelder'],
-
     package_dir={'': 'src'},
-    data_files = df,
     author='Jon Crowell',
     author_email='dev@literatelabs.com',
     url='shelder.literatelabs.com',

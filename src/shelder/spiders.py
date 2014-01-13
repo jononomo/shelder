@@ -123,7 +123,10 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         self.selenium_api_registry.register(page_class)
 
     def get_shell_input(self):
-        return raw_input('SHELDER> ').split(None,1) # results in ['command', 'the args']
+        prompt = '\n'
+        prompt = prompt+'Selenium API ==>> '+self.shell_local_context['PAGE'].__class__.__name__+'\n'
+        prompt = prompt+'SHELDER> '
+        return raw_input(prompt).split(None,1) # results in ['command', 'the args']
 
 
     def scrape_items(self):

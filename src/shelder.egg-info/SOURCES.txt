@@ -1,7 +1,6 @@
 README.rst
 VERSION
 ez_setup.py
-setup.cfg
 setup.py
 src/shelder/__init__.py
 src/shelder/csv_exporter.py
@@ -9,6 +8,7 @@ src/shelder/exceptions.py
 src/shelder/selenium_api.py
 src/shelder/spiders.py
 src/shelder.egg-info/PKG-INFO
+src/shelder.egg-info/SOURCES.txt
 src/shelder.egg-info/dependency_links.txt
 src/shelder.egg-info/requires.txt
 src/shelder.egg-info/top_level.txt

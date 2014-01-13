@@ -36,16 +36,16 @@ class AbstractSeleniumSpider(BaseSpider):
         while True:
             self.loop_count += 1
             print '\n'
-            print ('-'*30) + ' PARSE LOOP '+str(self.loop_count)+' '+('-'*30)
             if self.shell():
+                print ('-'*40) + ' SCRAPE-NAVIGATE LOOP '+str(self.loop_count)+' '+('-'*40)
                 for item in self.scrape_items():
                     yield item
                 if not self.navigate():
                     break
+                print ('-'*38) + ' END SCRAPE-NAVIGATE LOOP '+str(self.loop_count)+' '+('-'*38)+'\n'
             else:
                 break
-            print ('-'*28) + ' END PARSE LOOP '+str(self.loop_count)+' '+('-'*28)+'\n\n'
-        print ('-'*27) + ' END PARSE METHOD '+str(self.loop_count)+' '+('-'*27)+'\n\n'
+        print ('-'*37) + ' END PARSE METHOD '+str(self.loop_count)+' '+('-'*37)+'\n'
 
 
     def shutdown(self, spider=None):
@@ -83,34 +83,41 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     prompt = 'SHELDER> '
     name = 'InteractiveSeleniumSpider'
     load_time = -1.0
+    DEBUG = True
 
     def __init__(self):
-        # try:
         # print '-- A'
-        self.count = 0
-        self.selenium_api_registry = PageRegistry()
-        # print '-- B'
-        self.RUN = False # when False, it will expect command prompt interaction.
-        self.KEEP_CRAWLING = True
-        # print '-- C'
-        start_load_time = time.time()
-        super(InteractiveSeleniumSpider, self).__init__()
-        finish_load_time = time.time()
-        self.load_time = finish_load_time - start_load_time
-        # print '-- D'
-        self.shell_local_context = { 'self': self, 'time': self.load_time}
-        # except Exception, e:
-        #     self.shutdown()
-        #     raise e
+        try:
+            self.count = 0
+            self.selenium_api_registry = PageRegistry()
+            # print '-- B'
+            self.PAUSE = True # when True, it will expect command prompt interaction.
+            self.KEEP_CRAWLING = True
+            # print '-- C'
+            start_load_time = time.time()
+            super(InteractiveSeleniumSpider, self).__init__()
+            finish_load_time = time.time()
+            self.load_time = finish_load_time - start_load_time
+            # print '-- D'
+            self.shell_local_context = { 'self': self, 'time': self.load_time}
+        except Exception, e:
+            self.shutdown()
+            raise e
+        # print '-- E'
 
     def shell(self):
-        self.RUN = False
+        # we pause, get ready, get the page in the local context, then go to the user prompt
+        self.PAUSE = True
+        self.driver.switch_to_default_content()
         if self.count < 1:
             self.print_shell_message()
             self.count += 1
-        while not self.RUN:
-            # this next line will set 'PAGE' in self.shell_local_context
-            self.get_page()
+        # this next line will set 'PAGE' in self.shell_local_context
+        # print 'SSSSSSSSSSSSSSSSSS'*3
+        self.shell_local_context['PAGE'] = self.get_page().init()
+        # print self.shell_local_context
+        # print 'RRRRRRRRRRRRRRRRRR'*3
+        while self.PAUSE:
             rawinput = self.get_shell_input() # results in ['command', 'the args']
             if len(rawinput) == 0: continue
             command = rawinput[0]
@@ -120,8 +127,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         return self.KEEP_CRAWLING
 
     def get_page(self):
-        self.shell_local_context['PAGE'] = self.selenium_api_registry.get_page(self)
-        return self.shell_local_context['PAGE']
+        return self.selenium_api_registry.get_page(self)
 
     def register_page(self, page_class):
         self.selenium_api_registry.register(page_class)
@@ -129,23 +135,28 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     def get_shell_input(self):
         prmt = '\n'
         prmt += '%2.2f secs\n'%self.shell_local_context['time']
-        prmt = prmt+'Selenium API ==>> '+self.shell_local_context['PAGE'].__class__.__name__+'\n'
+        prmt = prmt+'Selenium API ==>> '+self.shell_local_context['PAGE'].__class__.__name__+': '
+        prmt = prmt+str(self.shell_local_context['PAGE'].nav_queue)+'\n'
         prmt = prmt+self.prompt
         return raw_input(prmt).split(None,1) # results in ['command', 'the args']
 
 
     def scrape_items(self):
-        page = self.get_page()
+        pg = self.shell_local_context['PAGE']
+        # if self.DEBUG:
+        #     print '\n********************************************'
+        #     print pg
+        #     print '********************************************\n'
         item_count = 0
-        if page.scrapeable():
-            for item in page.scrape_items():
+        if pg.scrapeable():
+            for item in pg.scrape_items():
                 item_count += 1
                 yield item
-        print str(self.loop_count)+'shell-SCRAPED : '+str(item_count)+' items from '+str(page.__class__)
+        print str(self.loop_count)+'shell-SCRAPED : '+str(item_count)+' items from '+str(pg.__class__)
         
 
     def navigate(self):
-        page = self.get_page()
+        page = self.shell_local_context['PAGE']
         if page.navigable():
             a_load_time = time.time()
             page = page.navigate()
@@ -156,9 +167,10 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
             # print self.load_time
             return True
         else:
+            print 'Selenium API reports that the page is no longer navigable'
             # nav_div = self.mainContent.find_element_by_id('WebPartWPQ2')
             # link = nav_div.find_element_by_link_text('Salary Search')
-            print str(self.loop_count)+'shell-NAV NO HELP...'
+            # print str(self.loop_count)+'shell-NAV NO HELP...'
             return False
 
 
@@ -188,7 +200,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
 
     def handle(self, command, args):
         arg1 = '' if not args else args.split()[0]
-        if   command == 'run'      : self.RUN = True
+        if   command == 'run'      : self.PAUSE = False
         elif command == 'exit'     : self.exit()
         elif command == 'help'     : self.print_help()
         elif command == 'vars'     : self.print_local_context()
@@ -204,7 +216,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     def exit(self):
         # perhaps counter-intuitively, we want to "run", meaning exit the shell and go back
         # to the automatic spider control, but we want the spider to then stop crawling.
-        self.RUN = True
+        self.PAUSE = False
         self.KEEP_CRAWLING = False
 
     def print_local_context(self):

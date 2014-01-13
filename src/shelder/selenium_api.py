@@ -78,7 +78,7 @@ class PageRegistry(object):
                     return self.active_pages[page_class]
                 else:
                     print 'building new page object with ', page_class
-                    self.active_pages[page_class] = page_class(spider)
+                    self.active_pages[page_class] = page_class(spider.selenium_api_registry , spider.driver)
                     return self.active_pages[page_class]
         print 'get_page() returning None'
         return None

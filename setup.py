@@ -35,7 +35,7 @@ try:
         LLIC = LL.read()
         if len(LLIC) > 20: LIT_LICENSE = LLIC
 except:
-    print 'LIT_LICENSE'
+    pass
 
 
 setup(

@@ -4,7 +4,7 @@ from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 from urlparse import urlparse
 from exceptions import UrlRegexException, UnscrapeablePageException, AbstractPageException
-from selenium_api import PageRegistry, HttpPage
+from selenium_api import PageRegistry, SeleniumHttpPage
 import re
 import os
 import datetime

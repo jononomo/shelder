@@ -80,12 +80,14 @@ class AbstractSeleniumSpider(BaseSpider):
 
 
 class InteractiveSeleniumSpider(AbstractSeleniumSpider):
+    prompt = 'SHELDER> '
     name = 'InteractiveSeleniumSpider'
     load_time = -1.0
 
     def __init__(self):
         # try:
         # print '-- A'
+        self.count = 0
         self.selenium_api_registry = PageRegistry()
         # print '-- B'
         self.RUN = False # when False, it will expect command prompt interaction.
@@ -103,7 +105,9 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
 
     def shell(self):
         self.RUN = False
-        self.print_shell_message()
+        if self.count < 1:
+            self.print_shell_message()
+            self.count += 1
         while not self.RUN:
             # this next line will set 'PAGE' in self.shell_local_context
             self.get_page()
@@ -123,10 +127,11 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         self.selenium_api_registry.register(page_class)
 
     def get_shell_input(self):
-        prompt = '\n'
-        prompt = prompt+'Selenium API ==>> '+self.shell_local_context['PAGE'].__class__.__name__+'\n'
-        prompt = prompt+'SHELDER> '
-        return raw_input(prompt).split(None,1) # results in ['command', 'the args']
+        prmt = '\n'
+        prmt += '%2.2f secs'%self.shell_local_context['time']
+        prmt = prmt+'Selenium API ==>> '+self.shell_local_context['PAGE'].__class__.__name__+'\n'
+        prmt = prmt+self.prompt
+        return raw_input(prmt).split(None,1) # results in ['command', 'the args']
 
 
     def scrape_items(self):

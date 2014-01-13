@@ -3,8 +3,9 @@ VERSION
 ez_setup.py
 setup.py
 src/shelder/__init__.py
-src/shelder/csv_exporter.py
 src/shelder/exceptions.py
+src/shelder/exporters.py
+src/shelder/items.py
 src/shelder/selenium_api.py
 src/shelder/spiders.py
 src/shelder.egg-info/PKG-INFO

@@ -59,7 +59,7 @@ class PageRegistry(object):
     active_pages = {}
     def __init__(self):
         # print 'PageRegistry.__init__'
-        self.register(HttpPage)
+        self.register(SeleniumHttpPage)
         # print 'PageRegistry.__init__  done'
         # self.print_registry()
 

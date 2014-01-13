@@ -128,7 +128,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
 
     def get_shell_input(self):
         prmt = '\n'
-        prmt += '%2.2f secs'%self.shell_local_context['time']
+        prmt += '%2.2f secs\n'%self.shell_local_context['time']
         prmt = prmt+'Selenium API ==>> '+self.shell_local_context['PAGE'].__class__.__name__+'\n'
         prmt = prmt+self.prompt
         return raw_input(prmt).split(None,1) # results in ['command', 'the args']

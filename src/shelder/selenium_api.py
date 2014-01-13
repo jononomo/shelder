@@ -13,28 +13,28 @@ class PersonItem(Item):
     gender = Field()
 
 
-class HttpPage(object):
-    def __init__(self, selenium_spider):
-        self.spider = selenium_spider
-        self.driver = selenium_spider.driver
+class SeleniumHttpPage(object):
+    def __init__(self, page_registry, web_driver):
+        self.api_registry = page_registry
+        self.driver = web_driver
         self.nav_queue = []
         # print self.__class__.__name__
         # print 'about to call init()'
         self.init()
 
     @classmethod
-    def accept(cls, driver):
+    def accept(cls, web_driver):
         # print 'running page_class.accept() on ', cls
         for regex in cls.url_regex():
-            if not re.match(regex, driver.current_url):
-                print 'rejected by '+cls.__name__+' '+driver.current_url
+            if not re.match(regex, web_driver.current_url):
+                # print 'rejected by '+cls.__name__+' '+web_driver.current_url
                 return False
-        print 'accepted by '+cls.__name__+' '+driver.current_url
+        print 'accepted by '+cls.__name__+' '+web_driver.current_url
         return True
 
     @classmethod
     def url_regex(cls):
-        return [r'^http://']
+        return [r'^http://.*']
 
     def navigable(self):
         return True if len(self.nav_queue) > 0 else False
@@ -43,6 +43,8 @@ class HttpPage(object):
         if len(self.nav_queue) > 0:
             nav_function = self.nav_queue[0]
             self.nav_queue = self.nav_queue[1:]
+            # return the result of calling the nav function. This should
+            # return another SeleniumHttpPage object, or a subclass of one
             return nav_function()
         else:
             return False
@@ -58,7 +60,7 @@ class HttpPage(object):
             print function
 
     def init(self):
-        # raise AbstractPageException('HttpPage should not be directly instantiated')
+        raise AbstractPageException('HttpPage should not be directly instantiated')
         pass
 
 

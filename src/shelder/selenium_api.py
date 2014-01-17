@@ -7,6 +7,7 @@ class SeleniumPage(object):
     def __init__(self, the_spider):
         self.spider = the_spider
         self.nav_queue = []
+        print 'inital empty self.nav_queue'
 
     @classmethod
     def accept(cls, web_driver):
@@ -16,7 +17,7 @@ class SeleniumPage(object):
         return False
 
     def scrape_items(self):
-        raise UnscrapeablePageException('SeleniumSpiderPage is not scrapeable - use subclass')
+        raise UnscrapeablePageException('SeleniumSpiderPage is not scrapeable - scrape_items() should be handled by a subclass')
 
     def navigable(self):
         return True if len(self.nav_queue) > 0 else False
@@ -35,8 +36,8 @@ class SeleniumPage(object):
         for function in self.nav_queue:
             print function
 
-    def init(self):
-        raise AbstractPageException('SeleniumPage should not be directly instantiated')
+    def prime(self):
+        raise AbstractPageException('SeleniumPage should not be directly instantiated - prime() should be handled by a subclass.')
         pass
 
 
@@ -56,13 +57,14 @@ class SeleniumHttpPage(SeleniumPage):
     def url_regex(cls):
         return [r'^http://.*']
 
+    def prime(self):
+        raise AbstractPageException('SeleniumHttpPage should not be directly instantiated - prime() should be handled by a subclass.')
 
 
 
 class PageRegistry(object):
     page_class_list = []
     active_pages = {}
-    page = None
     def __init__(self):
         # print 'PageRegistry.__init__'
         self.register(SeleniumPage)
@@ -77,23 +79,20 @@ class PageRegistry(object):
         try:
             for page_class in reversed(self.page_class_list):
                 # print 'page_class.accept(driver)'
-                # print str(page_class)+'.accept(driver['+driver.current_url+'])'
-                # print page_class.accept(driver)
+                # print str(page_class.__name__)+'.accept(driver['+spider.driver.current_url+'])'+'  =  '+str(page_class.accept(spider.driver))
                 if page_class.accept(spider.driver):
                     # if we are in here, then a registered page class
                     # has decided to accept responsibility
                     if page_class not in self.active_pages:
                         # print 'building new page object with ', page_class
                         self.active_pages[page_class] = page_class(spider)
-                    self.page = self.active_pages[page_class]
-                    if not isinstance(self.page, SeleniumPage):
+                    if not isinstance(self.active_pages[page_class], SeleniumPage):
                         raise Exception('page must be an instance of SeleniumPage')
-                    # print 'SWITCH: ',self.page.__class__.__name__
-                    return self.page
+                    # print 'REGISTRY: ',self.active_pages[page_class].__class__.__name__
+                    return self.active_pages[page_class]
         except Exception, e:
             print 'PageRegistry.get_page() EXCEPTION', e
-            raise e
-        print 'PageRegistry.get_page() returning None'
+        print 'PageRegistry.get_page() returning None. You should probably add a catch-all, like shelder.SeleniumHttpPage or shelder.SeleniumPage.'
         return None
 
     def register(self, page_class):

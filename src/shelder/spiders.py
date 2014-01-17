@@ -86,24 +86,24 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
     DEBUG = True
 
     def __init__(self):
-        # print '-- A'
+        print '-- A'
         try:
             self.count = 0
             self.selenium_api_registry = PageRegistry()
-            # print '-- B'
+            print '-- B'
             self.PAUSE = True # when True, it will expect command prompt interaction.
             self.KEEP_CRAWLING = True
-            # print '-- C'
+            print '-- C'
             start_load_time = time.time()
             super(InteractiveSeleniumSpider, self).__init__()
             finish_load_time = time.time()
             self.load_time = finish_load_time - start_load_time
-            # print '-- D'
+            print '-- D'
             self.shell_local_context = { 'self': self, 'time': self.load_time}
         except Exception, e:
             self.shutdown()
             raise e
-        # print '-- E'
+        print '-- E'
 
     def shell(self):
         # we pause, get ready, get the page in the local context, then go to the user prompt
@@ -114,7 +114,7 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
             self.count += 1
         # this next line will set 'PAGE' in self.shell_local_context
         # print 'SSSSSSSSSSSSSSSSSS'*3
-        self.shell_local_context['PAGE'] = self.get_page().init()
+        self.shell_local_context['PAGE'] = self.get_page().prime()
         # print self.shell_local_context
         # print 'RRRRRRRRRRRRRRRRRR'*3
         while self.PAUSE:
@@ -127,7 +127,8 @@ class InteractiveSeleniumSpider(AbstractSeleniumSpider):
         return self.KEEP_CRAWLING
 
     def get_page(self):
-        return self.selenium_api_registry.get_page(self)
+        self.shell_local_context['PAGE'] = self.selenium_api_registry.get_page(self)
+        return self.shell_local_context['PAGE']
 
     def register_page(self, page_class):
         self.selenium_api_registry.register(page_class)
